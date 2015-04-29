@@ -26,7 +26,7 @@ def processJSON_text(filename):
     return data
 
 def processTweets(tweet_tuples):
-    filter_prefix_set = ('@', 'http', 'rt', 'www')
+    filter_prefix_set = ('http', 'rt', 'www')
     real_tweets = []
     # filter for english
     for status in tweet_tuples:
@@ -36,7 +36,7 @@ def processTweets(tweet_tuples):
             # get rid of stopwords
             # no_stopwords_tweet = [word for word in tokenized if word not in common_words_set]
             # get rid of punctuation and internet terms
-            just_real_words = [re.sub(r'[^\w\s]','', word) for word 
+            just_real_words = [re.sub(r'[^\w\s\#\@]','', word) for word 
                                         in tokenized 
                                         if not word.startswith(filter_prefix_set)
                                     ]
