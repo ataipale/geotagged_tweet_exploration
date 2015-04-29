@@ -41,18 +41,33 @@ def processTweets(tweet_tuples):
                                         if not word.startswith(filter_prefix_set)
                                     ]
             if just_real_words:
-                real_tweets.append((tweet_tuples[0], just_real_words, tweet_tuples[2]))
+                real_tweets.append((status[0], ' '.join(just_real_words), status[2]))
     return real_tweets
 
 # test = processTweets(processJSON_text('geotagged_tweets.txt'))
 
-def main():
-    json_data =  processJSON_text('geotagged_tweets_english.txt')
-    print len(json_data)
-    real_tweets_tuple_list = processTweets(json_data)
-    print real_tweets_tuple_list[0:10]
-    print len(real_tweets_tuple_list)
+#def main():
+json_data =  processJSON_text('geotagged_tweets_english.txt')
+print len(json_data)
+real_tweets_tuple_list = processTweets(json_data)
+print real_tweets_tuple_list[0:10]
+print len(real_tweets_tuple_list)
 
-if __name__ == '__main__':
-    main()
+#if __name__ == '__main__':
+#    main()
 # 
+
+## Countries in the set
+country = set([country for (id, text, country) in real_tweets_tuple_list])
+
+## 
+counts_per_country = {}
+
+for c in country:
+    counts_per_country[c] = len([id for (id, text, country) in real_tweets_tuple_list if country == c])
+
+with open('id-text-country.csv', 'w') as filename:
+    f = csv.writer(filename)
+    for t in real_tweets_tuple_list:
+        f.writerow(t)
+
