@@ -9,17 +9,30 @@ def load(filename):
             except EOFError:
                 break
 
-items = load('geohashtag.txt')
+def addToCSV(filename):
+    items = load(filename)
 # text, hashtags, id, coordinates
-with open('text-hashtag-id-co.csv', 'a') as csvf:
-    csvfw = csv.writer(csvf)
+
     for tweet_dict in items:
-        for k in tweet_dict.keys():
-            for i in range(len(tweet_dict[k])):
-                dict_ascii = tweet_dict[k][i].encode('ascii', 'ignore').lower()
-        # print [dict_ascii for k in tweet_dict.keys()]
-        # csvfw.writerow((tweet_dict[k] 
-            # for k in tweet_dict.keys()))
+        for i in range(len(tweet_dict["hashtags"])):
+            row = []
+            coorx = tweet_dict["coordinates"]["coordinates"][0]
+            coory = tweet_dict["coordinates"]["coordinates"][1]
+            row.append(('%.2f' % (coorx)))
+            row.append(('%.2f' % (coory)))
+            row.append(tweet_dict["hashtags"][i]['text'].encode('utf8'))
+            with open('text-hashtag-id-co.csv', 'a') as csvf:
+                csvfw = csv.writer(csvf)
+                csvfw.writerow(row)
+            
+        
+
+def main():
+    addToCSV("geohashtag_2.txt")
+    addToCSV("geohashtag.txt")
+
+if __name__ == '__main__':
+   main()
 
 
 
