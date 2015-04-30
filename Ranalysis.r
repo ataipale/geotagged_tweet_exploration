@@ -1,27 +1,42 @@
-#options
-options(scipen=20)
+# read file
+hash <- read.csv('text-hashtag-id-co.csv', header = FALSE)
+names(hash) <- c('long','lat','hashtag')
 
-#libraries
+length(unique(hash$hashtag)) # number of unique hashtags
+counts <- with(hash, aggregate(long, list(hashtag), length)) # occurences of hashtags
+max(counts$x) 
+hist(counts$x)
+counts[ counts$x == max(counts$x),] # hashtag with maximum occurrences
+summary(counts$x)  # distribution of frequencies per hashtag
+hist(counts$x, xlim = c(0, 100), breaks = max(counts$x)/10) # prettier pic
 
-# data
-tweets <- read.csv('id-text-country.csv', header = FALSE, stringsAsFactors = FALSE)
-names(tweets) <- c('id','text','country')
+nrow(counts)*0.75
+nrow(counts[ counts$x >= 2,]) # number of hashtags with more than 2 occurrencies
+summary(counts$x[ counts$x >= 2]) # summary of counts when cpunts >= 2
 
-## get counts by country
-table(tweets$country)
-counts_by_country <- with(tweets, aggregate( id, by = list(country), length))
+library(sp)
+library(rworldmap)
+data(countriesCoarseLessIslands) # loading world map
+plot(countriesCoarseLessIslands) # plot map
+hash_coords <- SpatialPoints(hash[1:2]) # make SpatialPoint dataframe from regular coordinates
 
-barplot(table(tweets$country))
-hist(counts_by_country[,'x'] , breaks = max(counts_by_country$x)/20, xlim= c(0, 2000))
-boxplot(counts_by_country$x)
+plot(countriesCoarseLessIslands)
+points(hash_coords)  # map of the world with points on top
+
+proj4string(hash_coords) <- proj4string(countriesCoarseLessIslands) # assign coordinate/projection system to hash_coords (we need it to be the same as the polygons for the spatial join)
+
+spatial_join <- over(hash_coords, countriesCoarseLessIslands) # overlay points and assign to polygon
+
+plot(countriesCoarseLessIslands)
+points(hash_coords[5,], col = 'red') # plotting first 5 points to check that they have been assigned to the right country
+
+hash$country <- spatial_join$POSTAL # attching country code to long-lat-hashtag
+
+counts_by_country <- aggregate(hash$long, list(hash$country), length) # counts of occurrencies by country
 
 summary(counts_by_country$x)
 
-# filtering on countries that have more than 1000 tweets
-tweets_f <- tweets[ tweets$country %in% counts_by_country$Group.1[ counts_by_country$x >= 1000], ]
+hash_filtered <- hash[ hash$country %in% counts_by_country$Group.1[ counts_by_country$x >= 1000], ] # filtering on countries with freq >= 1000
+hash_filtered$country <- factor(hash_filtered$country)
 
-## country lookup 
-lookup_country <- data.frame( code = unique(tweets_f$country), name = c('United States', 'Great Britain', 'Canada', 'Brazil', 'Turkey', 'India', 'Malaysia', 'Philippines', 'South Africa', 'Ireland'))
-
-index <- regexpr("\#\w+", tweets_f$text, perl = TRUE)
-hashtags <- regmatches(tweets_f$text, index)
+lookup <- data.frame(country_code = sort(unique(hash_filtered$country)), country_name = c('Australia','Brazil', 'Canada', 'Spain', 'Uk', 'Italy', 'India','Indonesia', 'Malaysia', 'Philippines', 'Thailand','United States'))
