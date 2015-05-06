@@ -39,4 +39,11 @@ summary(counts_by_country$x)
 hash_filtered <- hash[ hash$country %in% counts_by_country$Group.1[ counts_by_country$x >= 1000], ] # filtering on countries with freq >= 1000
 hash_filtered$country <- factor(hash_filtered$country)
 
-lookup <- data.frame(country_code = sort(unique(hash_filtered$country)), country_name = c('Australia','Brazil', 'Canada', 'Spain', 'Uk', 'Italy', 'India','Indonesia', 'Malaysia', 'Philippines', 'Thailand','United States'))
+#lookup <- data.frame(country_code = sort(unique(hash_filtered$country)), country_name = c('Australia','Brazil', 'Canada', 'Spain', 'Uk', 'Italy', 'India','Indonesia', 'Malaysia', 'Philippines', 'Thailand','United States'))
+
+hash_per_country <- aggregate( hash_filtered$long, list(hash_filtered$hashtag, hash_filtered$country), length)
+names(hash_per_country) <- c('hashtag','country','freq')
+
+tmp <- split( hash_per_country, hash_per_country$country)
+tmp2 <- lapply(tmp, function(x) { out <- x[ order(-x$freq), ]; return(out[1:10,]) })
+top_hashtags <- do.call('rbind', tmp2)
