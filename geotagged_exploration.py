@@ -16,13 +16,16 @@ def processJSON_text(filename):
     and country ID as values
     '''
     data = []
-    for line in open(filename, 'r'):
-        line = line.strip()
-        if line:
-            json_line = json.loads(line)
-            if json_line.get("place") and json_line.get("lang"):
-                data.append((json_line.get("id"), json_line.get("text"), 
-                    json_line.get("place").get("country_code")))
+    dataa = pickle.load(open(filename))
+    for item in dataa:
+        print item
+    # for line in open(filename, 'r'):
+    #     line = line.strip()
+    #     if line:
+    #         json_line = json.loads(line)
+    #         if json_line.get("place") and json_line.get("lang"):
+    #             data.append((json_line.get("id"), json_line.get("text"), 
+    #                 json_line.get("place").get("country_code")))
     return data
 
 def processTweets(tweet_tuples):
@@ -47,7 +50,7 @@ def processTweets(tweet_tuples):
 # test = processTweets(processJSON_text('geotagged_tweets.txt'))
 
 #def main():
-json_data =  processJSON_text('geotagged_tweets_english.txt')
+json_data =  processJSON_text('test_geohashtag.txt')
 print len(json_data)
 real_tweets_tuple_list = processTweets(json_data)
 print real_tweets_tuple_list[0:10]
