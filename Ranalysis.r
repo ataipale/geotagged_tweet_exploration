@@ -45,12 +45,14 @@ hash_per_country <- aggregate( hash_filtered$long, list(hash_filtered$hashtag, h
 names(hash_per_country) <- c('hashtag','country','freq')
 
 tmp <- split( hash_per_country, hash_per_country$country)
-tmp2 <- lapply(tmp, function(x) { out <- x[ order(-x$freq), ]; return(out[1:100,]) })
+tmp2 <- lapply(tmp, function(x) { out <- x[ order(-x$freq), ]; return(out[1:120,]) })
 top_hashtags <- do.call('rbind', tmp2)
 
 
 pal2 <- brewer.pal(8,'Dark2')
-wordcloud(us$hashtag, us$freq, scale=c(8,.2),min.freq=3, max.words=20, random.order=FALSE, rot.per=.15, colors=pal2)
+# wordcloud(us$hashtag, us$freq, scale=c(8,.2),min.freq=3, max.words=20, random.order=FALSE, rot.per=.15, colors=pal2)
 
 
-with(top_hashtags[ top_hashtags$country == 'GB',] , wordcloud(hashtag, freq, scale=c(8,.2), min.freq=3, max.words=50, random.order=FALSE, rot.per=.15, colors = pal2))
+#with(top_hashtags[ top_hashtags$country == 'GB',] , wordcloud(hashtag, freq, scale=c(8,.2), min.freq=3, max.words=50, random.order=FALSE, rot.per=.15, colors = pal2))
+
+lookup_names <- data.frame(country_code = unique(top_hashtags$country), country_name = c("United Arab Emirates", "Australia", "Brazil", "Canada", "Germany", "Spain", "France", "Great Britain", "Italy", "India", "Indonesia", "Ireland", "Japan", "Mexico", "Malaysia", "The Netherlands", "Philippines", "Thailand", "Turkey", "United States", "South Africa"))
